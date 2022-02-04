@@ -17,6 +17,7 @@ function Header() {
         setUser(user);
         history("/home");
       }
+      //console.log(userPhoto)
     });
   }, [userName]);
 
@@ -88,7 +89,7 @@ function Header() {
           </NavMenu>
             <UserImg 
             onClick={handleAuth}
-            src="https://media.istockphoto.com/photos/shot-of-a-young-woman-using-a-telephone-and-computer-in-a-modern-picture-id1333685153?b=1&k=20&m=1333685153&s=170667a&w=0&h=9vu7DGVfQhV4NlFSb1I_TZZmpcbF_6OD6ST7Kp3iDnE=" />
+            src={userPhoto} />
           </>
         )}
       </Nav>
