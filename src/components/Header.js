@@ -6,49 +6,57 @@ import { useSelector, useDispatch } from "react-redux"
 import { auth, provider } from '../firebase'
 import { useEffect } from 'react';
 function Header() {
-    const dispatch = useDispatch()
-    const history = useNavigate()
-    const userName = useSelector(selectUserName);
-    const userPhoto = useSelector(selectUserPhoto);
+  const dispatch = useDispatch();
+  const history = useNavigate();
+  const userName = useSelector(selectUserName);
+  const userPhoto = useSelector(selectUserPhoto);
 
-    useEffect(() => {
-        auth.onAuthStateChanged( async (user) => {
-            if(user) {
-                dispatch(setUserLogin({
-                    name: user.displayName,
-                    email: user.email,
-                    photo: user.photoURL,
-                }))
-                history("/")
-            }
-        } )
-    }, [])
+  useEffect(() => {
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        setUser(user);
+        history("/home");
+      }
+    });
+  }, [userName]);
 
-    const signIn = () => {
-        auth.signInWithPopup(provider)
+  const handleAuth = () => {
+    if (!userName) {
+      auth
+        .signInWithPopup(provider)
         .then((result) => {
-            let user = result.user
-            dispatch(setUserLogin({
-                name: user.displayName,
-                email: user.email,
-                photo: user.photoURL,
-            }))
-            history('/')
+          setUser(result.user);
         })
-    }
-    const signOut = () => {
-        auth.signOut()
+        .catch((error) => {
+          alert(error.message);
+        });
+    } else if (userName) {
+      auth
+        .signOut()
         .then(() => {
-            dispatch(setSignOut());
-            history("./login");
+          dispatch(setSignOut());
+          history("/");
         })
+        .catch((err) => alert(err.message));
     }
+  };
+
+  const setUser = (user) => {
+    dispatch(
+      setUserLogin({
+        name: user.displayName,
+        email: user.email,
+        photo: user.photoURL,
+      })
+    );
+  };
+
     return (
       <Nav>
         <Logo src="/images/logo.svg" />
         {!userName ? (
             <LoginContainer>
-                <Login onClick={signIn}>LOGIN</Login>
+                <Login onClick={handleAuth}>LOGIN</Login>
             </LoginContainer>
       ) : (
         <>
@@ -79,7 +87,7 @@ function Header() {
             </a>
           </NavMenu>
             <UserImg 
-            onClick={signOut}
+            onClick={handleAuth}
             src="https://media.istockphoto.com/photos/shot-of-a-young-woman-using-a-telephone-and-computer-in-a-modern-picture-id1333685153?b=1&k=20&m=1333685153&s=170667a&w=0&h=9vu7DGVfQhV4NlFSb1I_TZZmpcbF_6OD6ST7Kp3iDnE=" />
           </>
         )}
